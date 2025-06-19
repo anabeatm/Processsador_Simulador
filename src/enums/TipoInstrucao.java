@@ -8,6 +8,7 @@ public enum TipoInstrucao {
 
 
     TipoInstrucao(int tipo){
-        this.tipo = tipo; // construtor para permitir argumento do tipo inteiro para diferenciar entre os tipos R e tipo I
+        this.tipo = tipo; // construtor para permitir argumento do tipo inteiro para diferenciar entre
+        // os tipos R e tipo I
     }
 }
