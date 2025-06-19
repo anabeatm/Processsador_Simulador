@@ -6,6 +6,7 @@ public enum TipoInstrucao {
 
     private final int tipo;
 
+
     TipoInstrucao(int tipo){
         this.tipo = tipo;
     }
