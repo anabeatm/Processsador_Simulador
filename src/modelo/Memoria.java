@@ -1,14 +1,17 @@
 package src.modelo;
 
 public class Memoria { // vai ser utilizada para simular memoria RAM
-    private int[] instrucao32Bits;
+    private int[] dado; // guarda um valor ou instrução de 32 bits
     private int tamanho; // número de posições dentro de 'intrução32Bits'
 
 
     public int lerValor(int endereco){
-        return instrucao32Bits[endereco]; // retornar o valor na posição do endereço
+        return dado[endereco]; // retornar o valor na posição do endereço
     }
 
+    public void escreverMemorai(int endereco, int valor){
+        dado[endereco] = valor;
+    }
 
 
 }
