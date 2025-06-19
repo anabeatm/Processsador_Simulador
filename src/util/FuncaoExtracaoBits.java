@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class FuncaoExtracaoBits {
-        public short extract_bits (short value, int bstart, int blength)
+        public static short extract_bits (short value, int bstart, int blength) // transformada em 'static' para não ter que criar um objeto da classe
         {
             short mask = (short)((1 << blength) - 1);
             return (short)((value >> bstart) & mask);
