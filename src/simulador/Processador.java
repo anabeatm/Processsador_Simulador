@@ -18,6 +18,6 @@ public class Processador { // controla o ciclo
     public Processador(){
         this.memoriaInstrucao = new Memoria(// colocar tamamnho);
         this.memoriaDeDdados = new Memoria(// colocar tamanho);
-        // colocar os outros metodos
+        // colocar os outros atributos
     }
 }

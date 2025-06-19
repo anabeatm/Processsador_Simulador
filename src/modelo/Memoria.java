@@ -6,19 +6,27 @@ public class Memoria { // vai ser utilizada para simular memoria RAM
 
 
 
-    public Memoria(int tamanho){
+    public Memoria(int tamanho){ // vai ser chamado no inicio da classe processador para criar o tamanho da memoria
         this.tamanho = tamanho;
         this.dado = new int[tamanho];
     }
 
 
     public int lerValor(int endereco){
+        if(endereco < 0 || endereco >= tamanho){
+            throw new IllegalArgumentException("Endereço inválido!!!"); // esse if verifica se o endereço esta dentro do intervalo
+        }
         return dado[endereco]; // retornar o valor na posição do endereço
     }
 
-    public void escreverMemorai(int endereco, int valor){
+    public void escreverMemoria(int endereco, int valor){
+        if(endereco < 0 || endereco >= tamanho){
+            throw new IllegalArgumentException("Endereço inválido!!!");
+        }
         dado[endereco] = valor;
     }
+
+
 
 
 }
