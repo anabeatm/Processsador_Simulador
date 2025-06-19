@@ -1,6 +1,6 @@
 # 💻 Simulador de Arquitetura de Computadores
 
-## 🎓 Curso **Engenharia de Software**
+## 🎓 Curso: **Engenharia de Software**
 
 
 ## 📚 Componente Curricular
