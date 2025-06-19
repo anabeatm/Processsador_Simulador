@@ -1,4 +1,4 @@
-package enums;
+package src.enums;
 
 public enum Operacoes {
     ADD(0),
@@ -16,7 +16,7 @@ public enum Operacoes {
 
     private final int upcode;
      Operacoes(int upcode){
-        this.upcode = upcode;
+        this.upcode = upcode; // construtor para permitir argumento do tipo inteiro para diferenciar as operações
     }
 
 
