@@ -16,8 +16,16 @@ public class Processador { // controla o ciclo
 
     //Criar um construtor que inicie os atributos, falando partirculamente da memoria para definir seu tamanho
     public Processador(){
-        this.memoriaInstrucao = new Memoria(// colocar tamamnho);
-        this.memoriaDeDdados = new Memoria(// colocar tamanho);
-        // colocar os outros atributos
+        this.memoriaInstrucao = new Memoria(256);
+        this.memoriaDeDdados = new Memoria(256);
+        this.PCcontador = 0;
+        this.registrador = new Registrador();
+        this.ativo = true;
+    }
+
+    // teste para ver se MEMORIA esta funcionando
+    public void carregarPrograma(String caminhoArquivo){
+        this.memoriaInstrucao.carregarBinario(caminhoArquivo);
+        System.out.println("Arquivo carredado com sucesso!!");
     }
 }

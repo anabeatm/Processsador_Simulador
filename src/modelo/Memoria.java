@@ -31,8 +31,8 @@ public class Memoria { // vai ser utilizada para simular memoria RAM
     }
 
 
-    public void carregarBinario(){
-        try(DataInputStream dis = new DataInputStream(new FileInputStream('caminhoArquivo'))){ // se der erro fecha o arquivo
+    public void carregarBinario(String caminhoArquivo){
+        try(DataInputStream dis = new DataInputStream(new FileInputStream(caminhoArquivo))){ // se der erro fecha o arquivo
         int i = 0; // inicializando um int i para se referir a memoria
         while(dis.available() >= 2 && i < dado.length){// dis.available --> retorna o numero de bytes disponiveis
                                                         // e verifica se ainda tem espaco na memoria com dado.length com indice i
