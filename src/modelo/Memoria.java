@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class Memoria { // vai ser utilizada para simular memoria RAM
     private int[] dado; // guarda um valor ou instrução de 32 bits
-    private int tamanho; // número de posições dentro de 'intrução32Bits']
+    private int tamanho; // número de posições dentro de 'intrução32Bits'
 
 
 
