@@ -38,7 +38,8 @@ public class Memoria { // vai ser utilizada para simular memoria RAM
                                                         // e verifica se ainda tem espaco na memoria com dado.length com indice i
             int low = dis.readByte() & 0xFF; // 0xFF --> converte o byte para inteiro --> numero entre 0 e 255 --> valores quando lemos um arquivo.bin, evitando o erro de lermos o bit mais a esquerda como um sinal (trasnformando o numero em negativo)
             int high = dis.readByte() & 0xFF;
-            int instrucao = (high << 8) | low; // o bits de high vão para a mais significativa e junta se com low formando a instrução
+            int instrucao = (high << 8) | low; // o bits de high vão para a mais significativa e junta se com low formando a instrução de 16 bits
+                                                // o high a parte mais significativa do 8 ao 15, e o low para 0 ao 17
             escreverMemoria(i, instrucao);
             i++;
         }
