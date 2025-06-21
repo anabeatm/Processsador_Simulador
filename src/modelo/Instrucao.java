@@ -13,6 +13,8 @@ public class Instrucao {
     private int registradorOperando2;
     private int imediato;
 
+    // TODO: colocar getters e setter para os atributos
+
     // TODO: agora decodificar() é uma classe Decodificador -> mudar isso no código
 //    public Instrucao(int valor) {
 //        funct = valor;
