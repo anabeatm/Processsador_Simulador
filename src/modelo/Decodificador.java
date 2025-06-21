@@ -24,6 +24,7 @@ public class Decodificador {
             instrucao.setRegistradorOperando2(registradorOperando2);
             instrucao.setTipoInstrucao(TipoInstrucao.R);
 
+
         } else if(tipo == 1){ // tipo I
             int upcode   = FuncaoExtracaoBits.extract_bits((short) binario, 13, 2);
             int registradorDestino = FuncaoExtracaoBits.extract_bits((short) binario, 10, 3);
