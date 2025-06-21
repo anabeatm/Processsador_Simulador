@@ -11,8 +11,10 @@ public class Decodificador {
 
     public Instrucao decodificar(int binario){
         Instrucao instrucao = new Instrucao();
-        int tipo = FuncaoExtracaoBits.extract_bits ((short)binario, 15, 1);
-
+        int tipo = FuncaoExtracaoBits.extract_bits ((short)binario, 15, 1); // pegar o tipo (R ou I)
+        if(tipo == 0){
+            instrucao.setUpcode
+        }
 
     }
 }

@@ -1,6 +1,8 @@
 package src.modelo;
+import src.enums.TipoInstrucao;
 
 public class Instrucao {
+    private TipoInstrucao tipoInstrucao; // para determinar o tipo R ou tipo I segundo a classe 'TipoInstrução'
     private int upcode;
     private int funct; // ou instrucao
     // no livro "organização e projeto de comp." diz que funct/instrucao
