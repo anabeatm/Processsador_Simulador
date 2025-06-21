@@ -22,4 +22,6 @@ public class Instrucao {
 //    private void decodificar() {
 //        tipo = ExtracaoBits.extract_bits((short) funct, 15, 1);
 //    }
+
+
 }
