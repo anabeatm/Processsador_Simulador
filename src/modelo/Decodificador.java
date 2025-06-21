@@ -35,6 +35,7 @@ public class Decodificador { // função principal vai transformar o codigo em b
             instrucao.setImediato(imediato);
             instrucao.setTipoInstrucao(TipoInstrucao.I);
         }
+
         return instrucao;
     }
 }
