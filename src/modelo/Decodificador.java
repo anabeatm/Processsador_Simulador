@@ -14,6 +14,7 @@ public class Decodificador {
         int tipo = FuncaoExtracaoBits.extract_bits ((short)binario, 15, 1); // pegar o tipo (R ou I)
         if(tipo == 0){
             instrucao.setUpcode
+
         }
 
     }
