@@ -5,25 +5,25 @@ import java.io.FileInputStream; // abre o arquivo dos bytes
 import java.io.IOException;
 
 public class Memoria { // vai ser utilizada para simular memoria RAM
-    private int[] dado; // guarda um valor ou instrução de 32 bits
+    private short[] dado; // guarda um valor ou instrução de 32 bits
     private int tamanho; // número de posições dentro de 'intrução32Bits'
 
 
 
     public Memoria(int tamanho){ // vai ser chamado no inicio da classe processador para criar o tamanho da memoria
         this.tamanho = tamanho;
-        this.dado = new int[tamanho];
+        this.dado = new short[tamanho];
     }
 
 
-    public int lerValor(int endereco){
+    public short lerValor(int endereco){
         if(endereco < 0 || endereco >= tamanho){
             throw new IllegalArgumentException("Endereço inválido!!!"); // esse if verifica se o endereço esta dentro do intervalo
         }
         return dado[endereco]; // retornar o valor na posição do endereço
     }
 
-    public void escreverMemoria(int endereco, int valor){
+    public void escreverMemoria(int endereco, short valor){
         if(endereco < 0 || endereco >= tamanho){
             throw new IllegalArgumentException("Endereço inválido!!!");
         }
@@ -38,7 +38,7 @@ public class Memoria { // vai ser utilizada para simular memoria RAM
                                                         // e verifica se ainda tem espaco na memoria com dado.length com indice i
             int low = dis.readByte() & 0xFF; // 0xFF --> converte o byte para inteiro --> numero entre 0 e 255 --> valores quando lemos um arquivo.bin, evitando o erro de lermos o bit mais a esquerda como um sinal (trasnformando o numero em negativo)
             int high = dis.readByte() & 0xFF;
-            int instrucao = (high << 8) | low; // o bits de high vão para a mais significativa e junta se com low formando a instrução de 16 bits
+            short instrucao = (short)((high << 8) | low); // o bits de high vão para a mais significativa e junta se com low formando a instrução de 16 bits
                                                 // o high a parte mais significativa do 8 ao 15, e o low para 0 ao 17
             escreverMemoria(i, instrucao);
             i++;

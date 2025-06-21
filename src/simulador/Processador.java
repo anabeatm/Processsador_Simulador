@@ -2,6 +2,8 @@ package src.simulador;
 
 import src.modelo.Memoria;
 import src.modelo.Registrador;
+import src.modelo.Decodificador;
+import src.modelo.Instrucao;
 
 public class Processador { // controla o ciclo
     private Memoria memoriaInstrucao; // instrução em binário é quardada aqui, 32 bits,
@@ -27,5 +29,20 @@ public class Processador { // controla o ciclo
     public void carregarPrograma(String caminhoArquivo){
         this.memoriaInstrucao.carregarBinario(caminhoArquivo);
         System.out.println("Arquivo carredado com sucesso!!");
+    }
+
+
+    public Memoria getMemoriaInstrucao() { // testar memoria
+        return memoriaInstrucao;
+    }
+
+
+    public void testarDecodificacao() {
+        Decodificador decodificador = new Decodificador();
+        short binario = memoriaInstrucao.lerValor(PCcontador); // geralmente posição 0
+        Instrucao instrucao = decodificador.decodificar(binario);
+
+        System.out.println("Instrução decodificada:");
+        System.out.println(instrucao); // toString da classe Instrucao
     }
 }
