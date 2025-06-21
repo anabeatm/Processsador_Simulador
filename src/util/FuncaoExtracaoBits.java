@@ -31,6 +31,7 @@ public class FuncaoExtracaoBits {
                     int high = dataInputStream.readByte() & 0x000000FF;
                     int value = (low | (high << 8)) & 0x0000FFFF;
 
+
                     this.memory_write((short)i, (short)value);
                 }
 
