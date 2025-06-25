@@ -11,7 +11,7 @@ public class Main {
         String caminhoArquivo = "programas/exemplo.bin"; // Ajustar o caminho
         cpu.carregarPrograma(caminhoArquivo);
 
-        cpu.testandoCicloSimples(); // 🚀 Executa o mini ciclo completo
+        cpu.testandoCicloSimples(); // Executa o mini ciclo completo
 
 //        Processador cpu = new Processador();
 //
