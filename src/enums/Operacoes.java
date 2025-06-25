@@ -19,6 +19,10 @@ public enum Operacoes {
         this.upcode = upcode; // construtor para permitir argumento do tipo inteiro para diferenciar as operações
     }
 
+    public int getUpcode(){
+         return this.upcode;
+    }
+
 
 
 }
