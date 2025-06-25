@@ -1,9 +1,6 @@
 package src.simulador;
 
-import src.modelo.Memoria;
-import src.modelo.Registrador;
-import src.modelo.Decodificador;
-import src.modelo.Instrucao;
+import src.modelo.*;
 
 public class Processador { // controla o ciclo
     private Memoria memoriaInstrucao; // instrução em binário é quardada aqui, 32 bits,
@@ -36,13 +33,34 @@ public class Processador { // controla o ciclo
         return memoriaInstrucao;
     }
 
-
-    public void testarDecodificacao() {
+    public void testandoCicloSimples() {
         Decodificador decodificador = new Decodificador();
-        short binario = memoriaInstrucao.lerValor(PCcontador); // geralmente posição 0
-        Instrucao instrucao = decodificador.decodificar(binario);
+        ALU alu = new ALU();
 
-        System.out.println("Instrução decodificada:");
-        System.out.println(instrucao); // toString da classe Instrucao
+        short binario = memoriaInstrucao.lerValor(PCcontador); // lendo valor na posição que o nosso PCcontador aponta
+        System.out.printf("Instrução lida (binário): 0x%04X%n", binario);
+
+        Instrucao instrucao = decodificador.decodificar(binario);
+        System.out.println("intrução decodificada --> " + instrucao);
+
+        int resultado = alu.executar(instrucao.getUpcode(), 5, 3); // TESTE --> por isso operadores fixos
+        System.out.println("resultado --> " + resultado);
+
     }
+
+
+
+
+
 }
+
+
+//    public void testarDecodificacao() {
+//        Decodificador decodificador = new Decodificador();
+//        short binario = memoriaInstrucao.lerValor(PCcontador); // geralmente posição 0
+//        Instrucao instrucao = decodificador.decodificar(binario);
+//
+//        System.out.println("Instrução decodificada:");
+//        System.out.println(instrucao); // toString da classe Instrucao
+//    }
+//}

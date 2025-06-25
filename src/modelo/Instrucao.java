@@ -39,6 +39,10 @@ public class Instrucao {
         this.upcode = upcode;
     }
 
+    public int getUpcode() {
+        return upcode;
+    }
+
     // TODO: agora decodificar() é uma classe Decodificador -> mudar isso no código
 //    public Instrucao(int valor) {
 //        funct = valor;
