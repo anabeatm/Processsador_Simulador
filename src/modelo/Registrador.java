@@ -2,7 +2,28 @@ package src.modelo;
 
 public class Registrador {
     private int[] posicaoRegsitrador; // cada posição é um registrador
-    private int quantidadeTotalRegistradores;
+//    private int quantidadeTotalRegistradores;
+
+    public Registrador(){
+        this.posicaoRegsitrador = new int[8]; // vamos trabalhar com 8 registradores  segundo o professor
+    }
+
+
+    public int lerPorIndice(int indice){
+        return posicaoRegsitrador[indice];
+    }
+
+
+    public void escrever(int valor, int indice){
+        this.posicaoRegsitrador[indice] = valor;
+    }
+
+    public void visualizarRegistrador(){ // ajudar na visualização do registrador
+
+    }
+
+
+
 }
 
 

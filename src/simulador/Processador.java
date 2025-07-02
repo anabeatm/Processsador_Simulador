@@ -22,11 +22,20 @@ public class Processador { // controla o ciclo
         this.ativo = true;
     }
 
-    // teste para ver se MEMORIA esta funcionando
-    public void carregarPrograma(String caminhoArquivo){
-        this.memoriaInstrucao.carregarBinario(caminhoArquivo);
-        System.out.println("Arquivo carredado com sucesso!!");
+
+    public void incrementarPCcontador(){
+        PCcontador ++;
     }
+
+
+
+
+
+    // teste para ver se MEMORIA esta funcionando
+//    public void carregarPrograma(String caminhoArquivo){
+//        this.memoriaInstrucao.carregarBinario(caminhoArquivo);
+//        System.out.println("Arquivo carredado com sucesso!!");
+//    }
 
 
     public Memoria getMemoriaInstrucao() { // testar memoria
