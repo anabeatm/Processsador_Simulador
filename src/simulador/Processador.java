@@ -1,5 +1,6 @@
 package src.simulador;
 
+import src.enums.TipoInstrucao;
 import src.modelo.*;
 
 public class Processador { // controla o ciclo
@@ -17,7 +18,7 @@ public class Processador { // controla o ciclo
     public Processador(){
         this.memoriaInstrucao = new Memoria(256);
         this.memoriaDeDdados = new Memoria(256);
-        this.PCcontador = 0;
+        this.PCcontador = 1;
         this.registrador = new Registrador();
         this.ativo = true;
     }
@@ -27,15 +28,16 @@ public class Processador { // controla o ciclo
         PCcontador ++;
     }
 
+    public Registrador getRegistrador() {
+        return registrador;
+    }
 
 
-
-
-    // teste para ver se MEMORIA esta funcionando
-//    public void carregarPrograma(String caminhoArquivo){
-//        this.memoriaInstrucao.carregarBinario(caminhoArquivo);
-//        System.out.println("Arquivo carredado com sucesso!!");
-//    }
+//     teste para ver se MEMORIA esta funcionando
+    public void carregarPrograma(String caminhoArquivo){
+        this.memoriaInstrucao.carregarBinario(caminhoArquivo);
+        System.out.println("Arquivo carredado com sucesso!!");
+    }
 
 
     public Memoria getMemoriaInstrucao() { // testar memoria
@@ -52,8 +54,23 @@ public class Processador { // controla o ciclo
         Instrucao instrucao = decodificador.decodificar(binario);
         System.out.println("intrução decodificada --> " + instrucao);
 
-        int resultado = alu.executar(instrucao.getUpcode(), 5, 3); // TESTE --> por isso operadores fixos
+//        int resultado = alu.executar(instrucao.getUpcode(), 5, 3); // TESTE --> por isso operadores fixos
+        int operando1 = registrador.lerPorIndice(instrucao.getRegistradorOperando1());
+        int operando2;
+
+        if(instrucao.getTipoInstrucao() == TipoInstrucao.R){
+            operando2 = registrador.lerPorIndice(instrucao.getRegistradorOperando2());
+
+        } else {
+            operando2 =instrucao.getImediato();
+        }
+
+        int resultado = alu.executar(instrucao.getUpcode(), operando1, operando2);
         System.out.println("resultado --> " + resultado);
+
+        registrador.escrever(resultado, instrucao.getRegistradorDestino());
+
+        incrementarPCcontador();
 
     }
 

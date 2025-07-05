@@ -43,6 +43,26 @@ public class Instrucao {
         return upcode;
     }
 
+    public int getRegistradorOperando1() {
+        return registradorOperando1;
+    }
+
+    public TipoInstrucao getTipoInstrucao() {
+        return tipoInstrucao;
+    }
+
+    public int getRegistradorOperando2() {
+        return registradorOperando2;
+    }
+
+    public int getImediato() {
+        return imediato;
+    }
+
+    public int getRegistradorDestino() {
+        return registradorDestino;
+    }
+
     // TODO: agora decodificar() é uma classe Decodificador -> mudar isso no código
 //    public Instrucao(int valor) {
 //        funct = valor;

@@ -8,10 +8,14 @@ public class Main {
 
         Processador cpu = new Processador();
 
-        String caminhoArquivo = "programas/exemplo.bin"; // Ajustar o caminho
-        cpu.carregarPrograma(caminhoArquivo);
+//        String caminhoArquivo = "C:/msys64/home/gusta/arq-sim-assembler/count.bin";
+        cpu.carregarPrograma("C:/msys64/home/gusta/arq-sim-assembler/count.bin");
 
-        cpu.testandoCicloSimples(); // Executa o mini ciclo completo
+        // Inicializar registradores com valores de teste
+        cpu.getRegistrador().escrever(0, 5); // exemplo: escrever valor 5 no registrador 0
+        cpu.getRegistrador().escrever(1, 3); // exemplo: escrever valor 3 no registrador 1
+
+        cpu.testandoCicloSimples(); // executa o mini ciclo completo
 
 //        Processador cpu = new Processador();
 //
