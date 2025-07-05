@@ -12,10 +12,8 @@ public class Processador { // controla o ciclo
     private boolean ativo; // quando encontra o syscall --> false; ativo == true; inativo == false
 
 
-
-
     //Criar um construtor que inicie os atributos, falando partirculamente da memoria para definir seu tamanho
-    public Processador(){
+    public Processador() {
         this.memoriaInstrucao = new Memoria(256);
         this.memoriaDeDdados = new Memoria(256);
         this.PCcontador = 1;
@@ -24,8 +22,8 @@ public class Processador { // controla o ciclo
     }
 
 
-    public void incrementarPCcontador(){
-        PCcontador ++;
+    public void incrementarPCcontador() {
+        PCcontador++;
     }
 
     public Registrador getRegistrador() {
@@ -33,8 +31,8 @@ public class Processador { // controla o ciclo
     }
 
 
-//     teste para ver se MEMORIA esta funcionando
-    public void carregarPrograma(String caminhoArquivo){
+    //     teste para ver se MEMORIA esta funcionando
+    public void carregarPrograma(String caminhoArquivo) {
         this.memoriaInstrucao.carregarBinario(caminhoArquivo);
         System.out.println("Arquivo carredado com sucesso!!");
     }
@@ -44,38 +42,80 @@ public class Processador { // controla o ciclo
         return memoriaInstrucao;
     }
 
-    public void testandoCicloSimples() {
-        Decodificador decodificador = new Decodificador();
-        ALU alu = new ALU();
 
-        short binario = memoriaInstrucao.lerValor(PCcontador); // lendo valor na posição que o nosso PCcontador aponta
-        System.out.printf("Instrução lida (binário): 0x%04X%n", binario);
-
-        Instrucao instrucao = decodificador.decodificar(binario);
-        System.out.println("intrução decodificada --> " + instrucao);
-
+// TESTE FEITO POR ISSO COMENTADO
+//    public void testandoCicloSimples() {
+//        Decodificador decodificador = new Decodificador();
+//        ALU alu = new ALU();
+//
+//        short binario = memoriaInstrucao.lerValor(PCcontador); // lendo valor na posição que o nosso PCcontador aponta
+//        System.out.printf("Instrução lida (binário): 0x%04X%n", binario);
+//
+//        Instrucao instrucao = decodificador.decodificar(binario);
+//        System.out.println("intrução decodificada --> " + instrucao);
+//
 //        int resultado = alu.executar(instrucao.getUpcode(), 5, 3); // TESTE --> por isso operadores fixos
-        int operando1 = registrador.lerPorIndice(instrucao.getRegistradorOperando1());
-        int operando2;
+//        int operando1 = registrador.lerPorIndice(instrucao.getRegistradorOperando1());
+//        int operando2;
+//
+//        if (instrucao.getTipoInstrucao() == TipoInstrucao.R) {
+//            operando2 = registrador.lerPorIndice(instrucao.getRegistradorOperando2());
+//
+//        } else {
+//            operando2 = instrucao.getImediato();
+//        }
+//
+//        int resultado = alu.executar(instrucao.getUpcode(), operando1, operando2);
+//        System.out.println("resultado --> " + resultado);
+//
+//        registrador.escrever(resultado, instrucao.getRegistradorDestino());
+//
+//        incrementarPCcontador();
+//
+//    }
 
-        if(instrucao.getTipoInstrucao() == TipoInstrucao.R){
-            operando2 = registrador.lerPorIndice(instrucao.getRegistradorOperando2());
+// testando em TODO o arquivo .bin
+   public void executarProgramaCompleto(){
+       Decodificador decodificador = new Decodificador();
+       ALU alu = new ALU();
 
-        } else {
-            operando2 =instrucao.getImediato();
-        }
-
-        int resultado = alu.executar(instrucao.getUpcode(), operando1, operando2);
-        System.out.println("resultado --> " + resultado);
-
-        registrador.escrever(resultado, instrucao.getRegistradorDestino());
-
-        incrementarPCcontador();
-
-    }
+    // mesmo processo do metodo testandoCicloSimples(), so que em looping
+       while(ativo){ // até encontrar Syscall
+           short binario = memoriaInstrucao.lerValor(PCcontador); // lendo valor na posição que o nosso PCcontador aponta
+           System.out.printf("Instrução lida (binário): 0x%04X%n", binario);
 
 
+           Instrucao instrucao = decodificador.decodificar(binario);
+           System.out.println("intrução decodificada --> " + instrucao);
 
+           int operando1 = registrador.lerPorIndice(instrucao.getRegistradorOperando1());
+           int operando2;
+
+           if (instrucao.getTipoInstrucao() == TipoInstrucao.R) {
+               operando2 = registrador.lerPorIndice(instrucao.getRegistradorOperando2());
+
+           } else {
+               operando2 = instrucao.getImediato();
+           }
+
+           int resultado = alu.executar(instrucao.getUpcode(), operando1, operando2);
+           System.out.println("resultado --> " + resultado);
+
+           registrador.escrever(resultado, instrucao.getRegistradorDestino());
+
+           if(instrucao.getUpcode() == 63){
+               System.out.println("Syscall --> encerrando programa");
+               ativo = false;
+           }
+
+           incrementarPCcontador();
+
+       }
+
+       System.out.println("Execução do arquivo .bin finalizada");
+       System.out.println();
+
+   }
 
 
 }

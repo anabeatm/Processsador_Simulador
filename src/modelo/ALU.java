@@ -35,6 +35,8 @@ public class ALU {
             case LOAD:
             case STORE:
                 return operando1 + operando2; // Base + Offset (imediato)
+            case MOV:
+                return  operando2;
             default:
                 throw new UnsupportedOperationException("Operação ALU não implementada: " + op);
         }

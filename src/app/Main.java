@@ -15,7 +15,7 @@ public class Main {
         cpu.getRegistrador().escrever(0, 5); // exemplo: escrever valor 5 no registrador 0
         cpu.getRegistrador().escrever(1, 3); // exemplo: escrever valor 3 no registrador 1
 
-        cpu.testandoCicloSimples(); // executa o mini ciclo completo
+        cpu.executarProgramaCompleto(); // executa o mini ciclo completo
 
 //        Processador cpu = new Processador();
 //
