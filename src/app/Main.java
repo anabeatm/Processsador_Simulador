@@ -17,6 +17,7 @@ public class Main {
 
         cpu.executarProgramaCompleto(); // executa o mini ciclo completo
 
+
 //        Processador cpu = new Processador();
 //
 //
