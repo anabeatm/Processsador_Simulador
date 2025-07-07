@@ -87,6 +87,14 @@ public class Processador { // controla o ciclo
 
            Instrucao instrucao = decodificador.decodificar(binario);
            System.out.println("intrução decodificada --> " + instrucao);
+           System.out.println("Upcode: " + instrucao.getUpcode() + " | Tipo: " + instrucao.getTipoInstrucao());
+
+           if (instrucao.getUpcode() == 63) { // Syscall
+               System.out.println("Syscall --> encerrando programa");
+               ativo = false;
+               break; // encerra o loop, não precisa passar na ALU
+           }
+
 
            int operando1 = registrador.lerPorIndice(instrucao.getRegistradorOperando1());
            int operando2;
@@ -98,7 +106,9 @@ public class Processador { // controla o ciclo
                operando2 = instrucao.getImediato();
            }
 
-           int resultado = alu.executar(instrucao.getUpcode(), operando1, operando2);
+
+           int resultado = alu.executar(instrucao.getUpcode(), operando1, operando2, instrucao.getTipoInstrucao());
+
            System.out.println("resultado --> " + resultado);
 
            registrador.escrever(resultado, instrucao.getRegistradorDestino());
