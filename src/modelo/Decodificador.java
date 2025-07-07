@@ -3,10 +3,8 @@ package src.modelo;
 import src.enums.TipoInstrucao;
 import src.util.FuncaoExtracaoBits;
 
-public class Decodificador { // função principal vai transformar o codigo em binário em um objeto do tipo Intrucao
-
-
-
+public class Decodificador {
+    // função principal vai transformar o codigo em binário em um objeto do tipo Intrucao
     public Instrucao decodificar(short binario){
         Instrucao instrucao = new Instrucao();
         int tipo = FuncaoExtracaoBits.extract_bits ((short)binario, 15, 1); // pegar o tipo (R ou I)
@@ -35,7 +33,6 @@ public class Decodificador { // função principal vai transformar o codigo em b
             instrucao.setImediato(imediato);
             instrucao.setTipoInstrucao(TipoInstrucao.I);
         }
-
         return instrucao;
     }
 }
