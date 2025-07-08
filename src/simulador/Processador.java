@@ -4,7 +4,7 @@ import src.enums.TipoInstrucao;
 import src.modelo.*;
 
 public class Processador { // controla o ciclo
-    private Memoria memoriaInstrucao; // instrução em binário é quardada aqui, 32 bits,
+    private Memoria memoriaInstrucao; // instrução em binário é guardada aqui, 32 bits,
     // acessada pelo PCcontador --> busca próxima instrução
     private Memoria memoriaDeDdados; // guarda valores DURANTE a execução
     private Registrador registrador; //registradores t0, t1, etc...
@@ -34,7 +34,7 @@ public class Processador { // controla o ciclo
     //     teste para ver se MEMORIA esta funcionando
     public void carregarPrograma(String caminhoArquivo) {
         this.memoriaInstrucao.carregarBinario(caminhoArquivo);
-        System.out.println("Arquivo carredado com sucesso!!");
+        System.out.println("Arquivo carregado com sucesso!!");
     }
 
 
@@ -42,6 +42,12 @@ public class Processador { // controla o ciclo
         return memoriaInstrucao;
     }
 
+    public void saltarPara(int endereco) {
+        if(endereco < 0 || endereco >= memoriaInstrucao.getTamanho()) {
+            throw new IllegalArgumentException("Endereço inválido para salto: " + endereco);
+        }
+        PCcontador = endereco;
+    }
 
 // TESTE FEITO POR ISSO COMENTADO
 //    public void testandoCicloSimples() {
@@ -74,7 +80,7 @@ public class Processador { // controla o ciclo
 //
 //    }
 
-// testando em TODO o arquivo .bin
+// testando em todo o arquivo .bin
    public void executarProgramaCompleto(){
        Decodificador decodificador = new Decodificador();
        ALU alu = new ALU();
@@ -95,7 +101,6 @@ public class Processador { // controla o ciclo
                break; // encerra o loop, não precisa passar na ALU
            }
 
-
            int operando1 = registrador.lerPorIndice(instrucao.getRegistradorOperando1());
            int operando2;
 
@@ -106,16 +111,60 @@ public class Processador { // controla o ciclo
                operando2 = instrucao.getImediato();
            }
 
-
            int resultado = alu.executar(instrucao.getUpcode(), operando1, operando2, instrucao.getTipoInstrucao());
 
            System.out.println("resultado --> " + resultado);
 
-           registrador.escrever(resultado, instrucao.getRegistradorDestino());
+           // para o Gustavo: TODO testar se as condições LOAD e STORE estão funcionando
+           if(instrucao.getTipoInstrucao() == TipoInstrucao.R) {
+               int upcode = instrucao.getUpcode();
+               if(upcode == 15) { // load
+                   int valorLido = memoriaDeDdados.lerValor(resultado);
+                   registrador.escrever(valorLido, instrucao.getRegistradorDestino());
+                   System.out.println("LOAD: Registrador r" + instrucao.getRegistradorDestino() + " <- Mem[" + resultado
+                           +"] = " + valorLido);
+                   incrementarPCcontador();
+                   continue;
+               }
+
+               if(upcode == 16) { // store
+                   int valor = registrador.lerPorIndice(instrucao.getRegistradorOperando2());
+                   memoriaDeDdados.escreverMemoria(resultado, (short)valor);
+                   System.out.println("STORE: Mem[" + resultado + "] <- r" + instrucao.getRegistradorOperando2() + " = "
+                           + valor);
+                   incrementarPCcontador();
+                   continue;
+               }
+           }
+
+//           registrador.escrever(resultado, instrucao.getRegistradorDestino());
+           if (instrucao.getTipoInstrucao() == TipoInstrucao.R && instrucao.getUpcode() != 15
+                   && instrucao.getUpcode() != 16) {
+               registrador.escrever(resultado, instrucao.getRegistradorDestino());
+           }
 
            if(instrucao.getUpcode() == 63){
                System.out.println("Syscall --> encerrando programa");
                ativo = false;
+           }
+
+           // para o Gustavo: TODO testar jump e jump_cond abaixo
+           if(instrucao.getUpcode() == 0 && instrucao.getTipoInstrucao() == TipoInstrucao.I) {
+               System.out.println("JUMP para " + resultado);
+               saltarPara(resultado);
+               continue;
+           }
+
+           if(instrucao.getUpcode() == 1 && instrucao.getTipoInstrucao() == TipoInstrucao.I) {
+               int condicao = registrador.lerPorIndice(instrucao.getRegistradorDestino());
+               if(condicao!=0) {
+                   System.out.println("JUMP CONDICIONAL para " + resultado);
+                   saltarPara(resultado);
+               } else {
+                   System.out.println("Não foi possível realizar a ação (condição falsa).");
+                   incrementarPCcontador();
+               }
+               continue;
            }
 
            incrementarPCcontador();
@@ -126,9 +175,8 @@ public class Processador { // controla o ciclo
        System.out.println();
 
    }
-
-
 }
+
 
 
 //    public void testarDecodificacao() {

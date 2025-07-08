@@ -13,7 +13,6 @@ public class Instrucao {
     private int registradorOperando2;
     private int imediato;
 
-    // TODO: colocar getters e setter para os atributos
 
     public void setImediato(int imediato) {
         this.imediato = imediato;
@@ -63,16 +62,6 @@ public class Instrucao {
         return registradorDestino;
     }
 
-    // TODO: agora decodificar() é uma classe Decodificador -> mudar isso no código
-//    public Instrucao(int valor) {
-//        funct = valor;
-//        decodificar();
-//    }
-//
-//    private void decodificar() {
-//        tipo = ExtracaoBits.extract_bits((short) funct, 15, 1);
-//    }
-
     @Override
     public String toString() {
         if (tipoInstrucao == TipoInstrucao.R) {
@@ -87,6 +76,4 @@ public class Instrucao {
             );
         }
     }
-
-
 }
