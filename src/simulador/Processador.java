@@ -23,7 +23,12 @@ public class Processador { // controla o ciclo
 
 
     public void incrementarPCcontador() {
-        PCcontador++;
+        if (PCcontador + 1 < memoriaInstrucao.getTamanho()) {
+            PCcontador++;
+        } else {
+            System.out.println("Fim da memória de instruções alcançado. Encerrando programa.");
+            ativo = false;
+        }
     }
 
     public Registrador getRegistrador() {
@@ -43,7 +48,7 @@ public class Processador { // controla o ciclo
     }
 
     public void saltarPara(int endereco) {
-        if(endereco < 0 || endereco >= memoriaInstrucao.getTamanho()) {
+        if (endereco < 0 || endereco >= memoriaInstrucao.getTamanho()) {
             throw new IllegalArgumentException("Endereço inválido para salto: " + endereco);
         }
         PCcontador = endereco;
@@ -80,105 +85,122 @@ public class Processador { // controla o ciclo
 //
 //    }
 
-// testando em todo o arquivo .bin
-   public void executarProgramaCompleto(){
-       Decodificador decodificador = new Decodificador();
-       ALU alu = new ALU();
+    // testando em todo o arquivo .bin
+    public void executarProgramaCompleto() {
+        System.out.println("===> INICIANDO EXECUÇÃO COMPLETA <===");
+        Decodificador decodificador = new Decodificador();
+        ALU alu = new ALU();
 
-    // mesmo processo do metodo testandoCicloSimples(), so que em looping
-       while(ativo){ // até encontrar Syscall
-           short binario = memoriaInstrucao.lerValor(PCcontador); // lendo valor na posição que o nosso PCcontador aponta
-           System.out.printf("Instrução lida (binário): 0x%04X%n", binario);
+        while (ativo) { // até encontrar syscall
+            short binario = memoriaInstrucao.lerValor(PCcontador);
+            System.out.printf("Instrução lida (binário): 0x%04X%n", binario);
 
+            Instrucao instrucao = decodificador.decodificar(binario);
+            System.out.println("intrução decodificada --> " + instrucao);
+            System.out.println("Upcode: " + instrucao.getUpcode() + " | Tipo: " + instrucao.getTipoInstrucao());
 
-           Instrucao instrucao = decodificador.decodificar(binario);
-           System.out.println("intrução decodificada --> " + instrucao);
-           System.out.println("Upcode: " + instrucao.getUpcode() + " | Tipo: " + instrucao.getTipoInstrucao());
+            if (instrucao.getUpcode() == 63) { // syscall encerra programa
+                System.out.println("Syscall --> encerrando programa");
+                ativo = false;
+                break;
+            }
 
-           if (instrucao.getUpcode() == 63) { // Syscall
-               System.out.println("Syscall --> encerrando programa");
-               ativo = false;
-               break; // encerra o loop, não precisa passar na ALU
-           }
+            int operando1 = registrador.lerPorIndice(instrucao.getRegistradorOperando1());
+            int operando2 = (instrucao.getTipoInstrucao() == TipoInstrucao.R) ?
+                    registrador.lerPorIndice(instrucao.getRegistradorOperando2()) :
+                    instrucao.getImediato();
 
-           int operando1 = registrador.lerPorIndice(instrucao.getRegistradorOperando1());
-           int operando2;
+            int resultado = alu.executar(instrucao.getUpcode(), operando1, operando2, instrucao.getTipoInstrucao());
 
-           if (instrucao.getTipoInstrucao() == TipoInstrucao.R) {
-               operando2 = registrador.lerPorIndice(instrucao.getRegistradorOperando2());
+            System.out.println("Resultado ALU: " + resultado);
 
-           } else {
-               operando2 = instrucao.getImediato();
-           }
+            // Trata LOAD
+            if (instrucao.getTipoInstrucao() == TipoInstrucao.R && instrucao.getUpcode() == 15) {
+                System.out.println("Executando LOAD...");
+                if (resultado < 0 || resultado >= memoriaDeDdados.getTamanho()) {
+                    System.err.printf("Erro: Endereço inválido para LOAD: %d%n", resultado);
+                    ativo = false;
+                    break;
+                }
+                int valorLido = memoriaDeDdados.lerValor(resultado);
+                registrador.escrever(valorLido, instrucao.getRegistradorDestino());
+                System.out.printf("LOAD: r%d <- Mem[%d] = %d%n", instrucao.getRegistradorDestino(), resultado, valorLido);
+                incrementarPCcontador();
+                continue;
+            }
 
-           int resultado = alu.executar(instrucao.getUpcode(), operando1, operando2, instrucao.getTipoInstrucao());
+            // Trata STORE
+            if (instrucao.getTipoInstrucao() == TipoInstrucao.R && instrucao.getUpcode() == 16) {
+                System.out.println("Executando STORE...");
+                if (resultado < 0 || resultado >= memoriaDeDdados.getTamanho()) {
+                    System.err.printf("Erro: Endereço inválido para STORE: %d%n", resultado);
+                    ativo = false;
+                    break;
+                }
+                int valor = registrador.lerPorIndice(instrucao.getRegistradorOperando2());
+                memoriaDeDdados.escreverMemoria(resultado, (short) valor);
+                System.out.printf("STORE: Mem[%d] <- r%d = %d%n", resultado, instrucao.getRegistradorOperando2(), valor);
+                incrementarPCcontador();
+                continue;
+            }
 
-           System.out.println("resultado --> " + resultado);
+            // Para instruções tipo R que não são LOAD/STORE, escreve resultado no registrador destino
+            if (instrucao.getTipoInstrucao() == TipoInstrucao.R &&
+                    instrucao.getUpcode() != 15 &&
+                    instrucao.getUpcode() != 16) {
+                registrador.escrever(resultado, instrucao.getRegistradorDestino());
+                System.out.printf("Registrador destino: r%d%n", instrucao.getRegistradorDestino());
+                System.out.println("Estado parcial dos registradores:");
+                registrador.visualizarRegistrador();
+                System.out.println("------------");
+            }
 
-           // para o Gustavo: TODO testar se as condições LOAD e STORE estão funcionando
-           if(instrucao.getTipoInstrucao() == TipoInstrucao.R) {
-               int upcode = instrucao.getUpcode();
-               if(upcode == 15) { // load
-                   int valorLido = memoriaDeDdados.lerValor(resultado);
-                   registrador.escrever(valorLido, instrucao.getRegistradorDestino());
-                   System.out.println("LOAD: Registrador r" + instrucao.getRegistradorDestino() + " <- Mem[" + resultado
-                           +"] = " + valorLido);
-                   incrementarPCcontador();
-                   continue;
-               }
+            // Trata JUMP (tipo I, upcode 0)
+            if (instrucao.getTipoInstrucao() == TipoInstrucao.I && instrucao.getUpcode() == 0) {
+                int destino = PCcontador + instrucao.getImediato();
+                System.out.println("JUMP para endereço: " + destino);
+                try {
+                    saltarPara(destino);
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Erro no salto: " + e.getMessage());
+                    ativo = false;
+                    break;
+                }
+                continue;
+            }
 
-               if(upcode == 16) { // store
-                   int valor = registrador.lerPorIndice(instrucao.getRegistradorOperando2());
-                   memoriaDeDdados.escreverMemoria(resultado, (short)valor);
-                   System.out.println("STORE: Mem[" + resultado + "] <- r" + instrucao.getRegistradorOperando2() + " = "
-                           + valor);
-                   incrementarPCcontador();
-                   continue;
-               }
-           }
+            // Trata JUMP_COND (tipo I, upcode 1)
+            if (instrucao.getTipoInstrucao() == TipoInstrucao.I && instrucao.getUpcode() == 1) {
+                int condicao = registrador.lerPorIndice(instrucao.getRegistradorDestino());
+                System.out.println("Condição jump_cond (r" + instrucao.getRegistradorDestino() + ") = " + condicao);
+                if (condicao != 0) {
+                    int destino = PCcontador + instrucao.getImediato();
+                    System.out.println("JUMP CONDICIONAL para endereço: " + destino);
+                    try {
+                        saltarPara(destino);
+                    } catch (IllegalArgumentException e) {
+                        System.err.println("Erro no salto condicional: " + e.getMessage());
+                        ativo = false;
+                        break;
+                    }
+                } else {
+                    System.out.println("Condição falsa, não saltando.");
+                    incrementarPCcontador();
+                }
+                continue;
+            }
 
-//           registrador.escrever(resultado, instrucao.getRegistradorDestino());
-           if (instrucao.getTipoInstrucao() == TipoInstrucao.R && instrucao.getUpcode() != 15
-                   && instrucao.getUpcode() != 16) {
-               registrador.escrever(resultado, instrucao.getRegistradorDestino());
-           }
+            // Para as demais instruções, incrementa PC normalmente
+            incrementarPCcontador();
+        }
 
-           if(instrucao.getUpcode() == 63){
-               System.out.println("Syscall --> encerrando programa");
-               ativo = false;
-           }
+        System.out.println("Execução do arquivo .bin finalizada");
+        System.out.println();
+        System.out.println("Estado Final Dos Registradores:");
+        registrador.visualizarRegistrador();
+    }
 
-           // para o Gustavo: TODO testar jump e jump_cond abaixo
-           if(instrucao.getUpcode() == 0 && instrucao.getTipoInstrucao() == TipoInstrucao.I) {
-               System.out.println("JUMP para " + resultado);
-               saltarPara(resultado);
-               continue;
-           }
-
-           if(instrucao.getUpcode() == 1 && instrucao.getTipoInstrucao() == TipoInstrucao.I) {
-               int condicao = registrador.lerPorIndice(instrucao.getRegistradorDestino());
-               if(condicao!=0) {
-                   System.out.println("JUMP CONDICIONAL para " + resultado);
-                   saltarPara(resultado);
-               } else {
-                   System.out.println("Não foi possível realizar a ação (condição falsa).");
-                   incrementarPCcontador();
-               }
-               continue;
-           }
-
-           incrementarPCcontador();
-
-       }
-
-       System.out.println("Execução do arquivo .bin finalizada");
-       System.out.println();
-
-   }
 }
-
-
-
 //    public void testarDecodificacao() {
 //        Decodificador decodificador = new Decodificador();
 //        short binario = memoriaInstrucao.lerValor(PCcontador); // geralmente posição 0

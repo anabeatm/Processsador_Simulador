@@ -5,6 +5,7 @@ public class Registrador {
     private int quantidadeTotalRegistradores;
 
     public Registrador(){
+        this.quantidadeTotalRegistradores = 8;
         this.posicaoRegsitrador = new int[8]; // vamos trabalhar com 8 registradores  segundo o professor
     }
 

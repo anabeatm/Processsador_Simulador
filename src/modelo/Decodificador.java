@@ -27,7 +27,9 @@ public class Decodificador {
             int upcode   = FuncaoExtracaoBits.extract_bits((short) binario, 13, 2);
             int registradorDestino = FuncaoExtracaoBits.extract_bits((short) binario, 10, 3);
             int imediato = FuncaoExtracaoBits.extract_bits((short) binario, 0, 10);
-
+            if ((imediato & (1 << 9)) != 0) {
+                imediato |= ~((1 << 10) - 1);
+            }
             instrucao.setUpcode(upcode);
             instrucao.setRegistradorDestino(registradorDestino);
             instrucao.setImediato(imediato);
