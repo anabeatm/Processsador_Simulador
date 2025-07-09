@@ -16,7 +16,7 @@ public class Processador { // controla o ciclo
     public Processador() {
         this.memoriaInstrucao = new Memoria(256);
         this.memoriaDeDdados = new Memoria(256);
-        this.PCcontador = 1;
+        this.PCcontador = 0;
         this.registrador = new Registrador();
         this.ativo = true;
     }
@@ -87,6 +87,11 @@ public class Processador { // controla o ciclo
 
     // testando em todo o arquivo .bin
     public void executarProgramaCompleto() {
+        System.out.println("Memória bruta (posição 0 a 10):");
+        for (int i = 0; i <= 10; i++) {
+            System.out.printf("[%d] = 0x%04X%n", i, memoriaInstrucao.lerValor(i));
+        }
+        System.out.println("Começando execução...");
         System.out.println("===> INICIANDO EXECUÇÃO COMPLETA <===");
         Decodificador decodificador = new Decodificador();
         ALU alu = new ALU();
