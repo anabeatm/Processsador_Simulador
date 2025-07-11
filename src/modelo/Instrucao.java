@@ -1,79 +1,45 @@
 package src.modelo;
+
 import src.enums.TipoInstrucao;
 
 public class Instrucao {
-    private TipoInstrucao tipoInstrucao; // para determinar o tipo R ou tipo I segundo a classe 'TipoInstrução'
+    private TipoInstrucao tipoInstrucao;
     private int upcode;
-    // private int funct; // ou instrucao COMENTADA POR MOTIVOS não sabemos se vai ser utilizada
-    // no livro "organização e projeto de comp." diz que funct/instrucao
-    // seleciona a variante específica da operação no campo op
-
-    private int registradorDestino;
-    private int registradorOperando1;
-    private int registradorOperando2;
+    private int rd;
+    private int rs;
+    private int rt;
     private int imediato;
 
-
-    public void setImediato(int imediato) {
-        this.imediato = imediato;
-    }
-
-    public void setRegistradorDestino(int registradorDestino) {
-        this.registradorDestino = registradorDestino;
-    }
-
-    public void setRegistradorOperando1(int registradorOperando1) {
-        this.registradorOperando1 = registradorOperando1;
-    }
-
-    public void setRegistradorOperando2(int registradorOperando2) {
-        this.registradorOperando2 = registradorOperando2;
-    }
-
-    public void setTipoInstrucao(TipoInstrucao tipoInstrucao) {
+    public Instrucao(TipoInstrucao tipoInstrucao, int upcode, int rd, int rs, int rt, int imediato) {
         this.tipoInstrucao = tipoInstrucao;
-    }
-
-    public void setUpcode(int upcode) {
         this.upcode = upcode;
-    }
-
-    public int getUpcode() {
-        return upcode;
-    }
-
-    public int getRegistradorOperando1() {
-        return registradorOperando1;
+        this.rd = rd;
+        this.rs = rs;
+        this.rt = rt;
+        this.imediato = imediato;
     }
 
     public TipoInstrucao getTipoInstrucao() {
         return tipoInstrucao;
     }
 
-    public int getRegistradorOperando2() {
-        return registradorOperando2;
+    public int getUpcode() {
+        return upcode;
+    }
+
+    public int getRegistradorDestino() {
+        return rd;
+    }
+
+    public int getRegistrador1() {
+        return rs;
+    }
+
+    public int getRegistrador2() {
+        return rt;
     }
 
     public int getImediato() {
         return imediato;
-    }
-
-    public int getRegistradorDestino() {
-        return registradorDestino;
-    }
-
-    @Override
-    public String toString() {
-        if (tipoInstrucao == TipoInstrucao.R) {
-            return String.format(
-                    "[Tipo R] opcode: %d | rd: r%d | rs: r%d | rt: r%d",
-                    upcode, registradorDestino, registradorOperando1, registradorOperando2
-            );
-        } else {
-            return String.format(
-                    "[Tipo I] opcode: %d | rd: r%d | imediato: %d",
-                    upcode, registradorDestino, imediato
-            );
-        }
     }
 }

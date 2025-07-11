@@ -1,40 +1,26 @@
 package src.modelo;
 
-import src.enums.TipoInstrucao;
+import src.modelo.Instrucao;
+import src.enums.*;
 import src.util.FuncaoExtracaoBits;
 
 public class Decodificador {
-    // função principal vai transformar o codigo em binário em um objeto do tipo Intrucao
-    public Instrucao decodificar(short binario){
-        Instrucao instrucao = new Instrucao();
-        int tipo = FuncaoExtracaoBits.extract_bits ((short)binario, 15, 1); // pegar o tipo (R ou I)
-        if(tipo == 0){ // tipo 0
 
-            // extraindo as partes necessárias para definir cada atributo de 'Instrucao'
-            int upcode = FuncaoExtracaoBits.extract_bits((short)binario, 9, 6);
-            int registradorDestino = FuncaoExtracaoBits.extract_bits((short)binario, 6, 3);
-            int registradorOperando1 = FuncaoExtracaoBits.extract_bits((short)binario, 3, 3);
-            int registradorOperando2 = FuncaoExtracaoBits.extract_bits((short)binario, 0, 3);
+    public static Instrucao decodificar(short binario) {
+        short bitFormato = FuncaoExtracaoBits.extract_bits(binario, 15, 1);
+      TipoInstrucao tipoInstrucao = (bitFormato == 0) ? TipoInstrucao.R : TipoInstrucao.I;
 
-            instrucao.setUpcode(upcode);
-            instrucao.setRegistradorDestino(registradorDestino);
-            instrucao.setRegistradorOperando1(registradorOperando1);
-            instrucao.setRegistradorOperando2(registradorOperando2);
-            instrucao.setTipoInstrucao(TipoInstrucao.R);
-
-
-        } else if(tipo == 1){ // tipo I
-            int upcode   = FuncaoExtracaoBits.extract_bits((short) binario, 13, 2);
-            int registradorDestino = FuncaoExtracaoBits.extract_bits((short) binario, 10, 3);
-            int imediato = FuncaoExtracaoBits.extract_bits((short) binario, 0, 10);
-            if ((imediato & (1 << 9)) != 0) {
-                imediato |= ~((1 << 10) - 1);
-            }
-            instrucao.setUpcode(upcode);
-            instrucao.setRegistradorDestino(registradorDestino);
-            instrucao.setImediato(imediato);
-            instrucao.setTipoInstrucao(TipoInstrucao.I);
+        if (tipoInstrucao == TipoInstrucao.R) {
+            int opcode = FuncaoExtracaoBits.extract_bits(binario, 9, 6);
+            int rd = FuncaoExtracaoBits.extract_bits(binario, 6, 3);
+            int rs = FuncaoExtracaoBits.extract_bits(binario, 3, 3);
+            int rt = FuncaoExtracaoBits.extract_bits(binario, 0, 3);
+            return new Instrucao(tipoInstrucao, opcode, rd, rs, rt, 0);
+        } else {
+            int opcode = FuncaoExtracaoBits.extract_bits(binario, 13, 2);
+            int rd = FuncaoExtracaoBits.extract_bits(binario, 10, 3); // Corrigido (bits 13:11)
+            int imediato = FuncaoExtracaoBits.extract_bits(binario, 0, 10);
+            return new Instrucao(tipoInstrucao, opcode, rd, 0, 0, imediato);
         }
-        return instrucao;
     }
 }

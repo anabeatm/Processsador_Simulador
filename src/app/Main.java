@@ -1,13 +1,10 @@
 package src.app;
+import simulador.Processador;
 
-
-import src.simulador.Processador;
 public class Main {
     public static void main(String[] args) {
-        Processador cpu = new Processador();
-
-        String caminhoArquivoBin = "C:/msys64/home/gusta/arq-sim-assembler/testeJump.bin";
-        cpu.carregarPrograma(caminhoArquivoBin);
-        cpu.executarProgramaCompleto();
+        Processador processador = new Processador();
+        processador.carregarPrograma("C:/msys64/home/gusta/arq-sim-assembler/perfect-squares.bin");
+        processador.iniciar();
     }
 }
