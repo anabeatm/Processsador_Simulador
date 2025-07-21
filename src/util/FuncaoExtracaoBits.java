@@ -17,7 +17,6 @@ public class FuncaoExtracaoBits {
 
     void loadBinary (String binaryName)
     {
-
         try {
             FileInputStream fileInputStream = new FileInputStream(binaryName);
             DataInputStream dataInputStream = new DataInputStream(fileInputStream);

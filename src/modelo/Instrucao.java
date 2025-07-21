@@ -1,7 +1,7 @@
 package src.modelo;
 
-import src.enums.OperacoesR; // Importado
-import src.enums.OperacoesI; // Importado
+import src.enums.OperacoesR;
+import src.enums.OperacoesI;
 import src.enums.TipoInstrucao;
 
 public class Instrucao {
@@ -19,6 +19,7 @@ public class Instrucao {
     // Construtor para Tipo R
     public Instrucao(short codigoBinario, TipoInstrucao tipo, OperacoesR operacao, int rd, int rs, int rt) {
         this.codigoBinario = codigoBinario;
+        this.tipo = tipo; // <<<<<<<< CORREÇÃO: Adicionado
         this.operacaoR = operacao;
         this.operacaoI = null;
         this.registradorDestino = (short) rd;
@@ -70,9 +71,15 @@ public class Instrucao {
         return imediato;
     }
 
-
+    // O opcode agora é extraído diretamente do código binário
+    // É importante que este getOpcode esteja consistente com a forma como o Decodificador extrai o opcode
     public short getOpcode() {
-        return (short) ((codigoBinario >> 12) & 0xF);
+        // Se a instrução é tipo R (formato 0), o opcode está nos bits 9-14
+        if (tipo == TipoInstrucao.R) {
+            return (short) ((codigoBinario >> 9) & 0x3F); // 6 bits de opcode
+        } else { // Se a instrução é tipo I (formato 1), o opcode está nos bits 13-14
+            return (short) ((codigoBinario >> 13) & 0x03); // 2 bits de opcode
+        }
     }
 
 
@@ -80,6 +87,7 @@ public class Instrucao {
     public String toString() {
         if (tipo == TipoInstrucao.R) {
             if (operacaoR == OperacoesR.SYSCALL) {
+                // Para SYSCALL, rs é o serviço, rd e rt são 0.
                 return "Instrucao [Tipo=" + tipo + ", Operacao=" + operacaoR + ", Serviço=" + registrador1 + "]";
             }
             return "Instrucao [Tipo=" + tipo + ", Operacao=" + operacaoR +
