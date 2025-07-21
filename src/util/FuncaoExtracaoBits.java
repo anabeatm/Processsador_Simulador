@@ -5,20 +5,20 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 public class FuncaoExtracaoBits {
-    public static short extract_bits (short value, int bstart, int blength)
+    public static short extractBits (short value, int bstart, int blength)
     {
         short mask = (short)((1 << blength) - 1);
         return (short)((value >> bstart) & mask);
     }
 
-    public void memory_write (short addr, short value) {
+    public void memoryWrite (short addr, short value) {
         // Não usado diretamente, mas mantido como placeholder conforme padrão do professor
     }
 
-    void load_binary (String binary_name)
+    void loadBinary (String binaryName)
     {
         try {
-            FileInputStream fileInputStream = new FileInputStream(binary_name);
+            FileInputStream fileInputStream = new FileInputStream(binaryName);
             DataInputStream dataInputStream = new DataInputStream(fileInputStream);
 
             long tamanhoArquivo = fileInputStream.getChannel().size();
@@ -30,7 +30,7 @@ public class FuncaoExtracaoBits {
                 int high = dataInputStream.readByte() & 0x000000FF;
                 int value = (low | (high << 8)) & 0x0000FFFF;
 
-                this.memory_write((short)i, (short)value);
+                this.memoryWrite((short)i, (short)value);
             }
 
             dataInputStream.close();

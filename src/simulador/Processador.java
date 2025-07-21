@@ -1,122 +1,211 @@
 package src.simulador;
 
-import src.enums.Operacoes;
-import src.enums.TipoInstrucao;
 import src.modelo.*;
+import src.enums.TipoInstrucao;
+import src.enums.OperacoesR;
+import src.enums.OperacoesI;
+import src.util.FuncaoExtracaoBits;
 
 public class Processador {
-    private Memoria memoriaInstrucao;
-    private Memoria memoriaDeDados;
-    private Registrador registrador;
-    private int PCcontador;
-    private boolean executando;
-    private int ciclosBusca = 0;
-    private int ciclosExecucao = 0;
+    private Memoria memoria;
+    private Registrador registradores;
+    private int contadorPrograma; // Program Counter (PC)
+    public boolean executando;   // Flag para controlar o ciclo de execução
+    private int ciclos;
+    private int formato;
 
     public Processador() {
-        this.memoriaInstrucao = new Memoria(256);
-        this.memoriaDeDados = new Memoria(10000);
-        this.registrador = new Registrador(8);
-        this.PCcontador = 2; // Ignora cabeçalho do binário
+        this.memoria = new Memoria();
+        this.registradores = new Registrador();
+        this.contadorPrograma = 1;
         this.executando = true;
+        this.ciclos = 0;
     }
 
-    public void carregarPrograma(String caminhoArquivo) {
-        memoriaInstrucao.carregarBinario(caminhoArquivo);
+    public boolean isExecutando() {
+        return executando;
     }
 
-    public void iniciar() {
+
+    public void carregarPrograma(String caminhoArquivoBin, int pcInicial) {
+        memoria.carregarBinario(caminhoArquivoBin, pcInicial);
+        this.contadorPrograma = pcInicial;
+        this.executando = true;
+        System.out.println("\n[Processador] Programa carregado. PC inicial: " + pcInicial);
+    }
+
+    public void executarProgramaCompleto() {
+        System.out.println("\n--- Iniciando Execução do Programa ---");
         while (executando) {
-            short binario = memoriaInstrucao.lerValor(PCcontador);
-            ciclosBusca++;
-
-            Instrucao instrucao = Decodificador.decodificar(binario);
-            executarInstrucao(instrucao);
+            executarProximaInstrucao();
+            if (ciclos > 100000000) {
+                System.err.println("[ERRO FATAL] Limite de ciclos excedido. Possível loop infinito ou SYSCALL ausente.");
+                executando = false;
+            }
         }
-
-        System.out.println("FIM DA EXECUCÇÃO");
-        System.out.println("TOTAL DE CICLOS: " + (ciclosBusca + ciclosExecucao));
-        System.out.println("BUSCAS FEITAS: " + ciclosBusca);
-        System.out.println("EXECUÇÕES: " + ciclosExecucao);
-        System.out.println("\nREGISTRADORES:");
-        registrador.mostrarConteudo();
+        System.out.println("--- Execução do Programa Concluída ---");
+        registrarEstadoFinal();
     }
 
-    private void executarInstrucao(Instrucao instrucao) {
-        int opcode = instrucao.getUpcode();
+    private void executarProximaInstrucao() {
+        ciclos++;
+        System.out.println("\n------------------------------------");
+        System.out.printf("[Ciclo %d] PC: %d\n", ciclos, contadorPrograma);
+
+        short instrucao = memoria.ler(contadorPrograma);
+        System.out.printf("[FETCH] Instrução binária lida (0x%04X): %s\n", instrucao, Integer.toBinaryString(instrucao & 0xFFFF));
+
+        Instrucao instrucaoDecodificada = Decodificador.decodificar(instrucao);
+        System.out.println("[DECODE] Instrução Decodificada: " + instrucaoDecodificada);
+        registradores.mostrarConteudo();
+
+        boolean pcModificado = executarInstrucao(instrucaoDecodificada, instrucao);
+
+        if (!pcModificado) {
+            contadorPrograma++;
+        }
+    }
+
+    private boolean executarInstrucao(Instrucao instrucao, short instrucaoBinaria) {
         TipoInstrucao tipo = instrucao.getTipoInstrucao();
+        short instrucaoTeste = memoria.ler(contadorPrograma);
+        boolean pcModificado = false;
 
-        if (tipo == TipoInstrucao.R) {
-            int op1 = registrador.lerPorIndice(instrucao.getRegistrador1());
-            int op2 = registrador.lerPorIndice(instrucao.getRegistrador2());
-            int resultado = 0;
+        short format = FuncaoExtracaoBits.extractBits(instrucaoTeste, 15, 1);
+        System.out.println("FORMATO É:"+format);
 
-            switch (opcode) {
-                case 0: resultado = op1 + op2; break;
-                case 1: resultado = op1 - op2; break;
-                case 2: resultado = op1 * op2; break;
-                case 3: resultado = op1 / op2; break;
-                case 4: resultado = (op1 == op2) ? 1 : 0; break;
-                case 5: resultado = (op1 != op2) ? 1 : 0; break;
-                case 15: resultado = memoriaDeDados.lerValor(op1); break;
-                case 16:
-                    System.out.println("[DEBUG] Tentando escrever na memória de dados: endereço " + op1 + ", valor " + op2);
 
-                    if (op1 >= memoriaDeDados.getTamanho() || op1 < 0) {
-                        System.out.println("[ERRO] STORE: endereço fora do limite da memória de dados -> " + op1);
-                        executando = false;
-                        return;
-                    }
+        if (format == 0) {
+            OperacoesR operacao = instrucao.getOperacaoR();
+            short rd = instrucao.getRegistradorDestino();
+            short rs = instrucao.getRegistrador1();
+            short rt = instrucao.getRegistrador2();
+            short valorRs = registradores.ler(rs);
+            short valorRt = registradores.ler(rt);
+            short resultado = 0;
 
-                    memoriaDeDados.escreverMemoria(op1, (short) op2);
-                    incrementarPC();
-                    ciclosExecucao++;
-                    return;
-                case 63:
-                    if (op1 == 0) {
-                        executando = false;
-                        return;
-                    }
+            pcModificado = false;
+            switch (operacao) {
+                case ADD:
+                    resultado = (short) (valorRs + valorRt);
                     break;
+                case SUB:
+                    resultado = (short) (valorRs - valorRt);
+                    break;
+                case MUL:
+                    resultado = (short) (valorRs * valorRt);
+                    break;
+                case DIV:
+                    if (valorRt == 0) {
+                        System.err.println("[Erro DIV] Divisão por zero.");
+                        executando = false;
+                        return false;
+                    }
+                    resultado = (short) (valorRs / valorRt);
+                    break;
+                case CMP_EQUAL:
+                    resultado = (short) ((valorRs == valorRt) ? 1 : 0);
+                    break;
+                case CMP_NEQ:
+                    resultado = (short) ((valorRs != valorRt) ? 1 : 0);
+                    break;
+                case LOAD:
+                    int enderecoLoad = valorRs + valorRt;
+                    if (enderecoLoad < 0 || enderecoLoad >= memoria.getTamanhoMemoria()) {
+                        System.err.println("[Erro LOAD] Endereço de memória inválido: " + enderecoLoad);
+                        executando = false;
+                        return false;
+                    }
+                    resultado = memoria.ler(enderecoLoad);
+                    break;
+                case STORE:
+                    int enderecoStore = valorRs;
+                    if (enderecoStore < 0 || enderecoStore >= memoria.getTamanhoMemoria()) {
+                        System.err.printf("[Erro STORE] Endereço inválido: %d\n", enderecoStore);
+                        executando = false;
+                        return false;
+                    }
+                    memoria.store(enderecoStore, registradores.ler(rd));
+                    System.out.printf("[EXECUTE] STORE Mem[%d] <- R%d = %d\n", enderecoStore, rd, registradores.ler(rd));
+                    return false;
+                case SYSCALL:
+                    int servico = registradores.ler(0);
+                    System.out.printf("[EXECUTE] SYSCALL (Serviço: %d)\n", servico);
+                    switch (servico) {
+                        case 0 -> {
+                            executando = false;
+                            System.out.println("[SYSCALL] Encerrando programa.");
+                        }
+                        case 1 -> System.out.print((char) registradores.ler(2));
+                        case 2 -> System.out.println();
+                        case 3 -> System.out.print(registradores.ler(2));
+                        case 4 -> {
+                            int endereco = registradores.ler(2);
+                            short ch;
+                            while ((ch = memoria.ler(endereco++)) != 0) {
+                                System.out.print((char) ch);
+                            }
+                        }
+                        default -> {
+                            System.err.println("[SYSCALL] Código inválido.");
+                            executando = false;
+                        }
+                    }
+                    return false;
+                case NOP_R:
+                    System.out.println("[EXECUTE] NOP (R-Type)");
+                    return false;
                 default:
-                    System.out.println("Opcode R inválido: " + opcode);
+                    System.err.println("[Erro] Operação R-Type inválida: " + operacao);
                     executando = false;
-                    return;
+                    return false;
             }
 
-            registrador.escrever(instrucao.getRegistradorDestino(), resultado);
-        }
+            registradores.escrever(rd, resultado);
+            System.out.printf("[EXECUTE] R-Type %s -> R%d = %d\n", operacao, rd, resultado);
+        } else {
+            OperacoesI operacao = instrucao.getOperacaoI();
+            short rd = instrucao.getRegistradorDestino();
+            short imediato = instrucao.getImediato();
 
-        else if (tipo == TipoInstrucao.I) {
-            switch (opcode) {
-                case 0: // JUMP
-                    PCcontador = instrucao.getImediato();
-                    ciclosExecucao++;
-                    return;
-                case 1: // JUMP_COND
-                    int cond = registrador.lerPorIndice(instrucao.getRegistradorDestino());
-                    if (cond != 0) {
-                        PCcontador = instrucao.getImediato();
+            switch (operacao) {
+                case JUMP:
+                    contadorPrograma = instrucao.getRegistrador1();
+                    pcModificado = true;
+                    System.out.printf("[EXECUTE] JUMP -> PC = %d\n", imediato);
+                    break;
+                case JUMP_COND:
+                    if (registradores.ler(rd) == 1) {
+                        contadorPrograma = imediato;
+                        pcModificado = true;
+                        System.out.printf("[EXECUTE] JUMP_COND -> PC = %d\n", imediato);
                     } else {
-                        incrementarPC();
+                        System.out.printf("[EXECUTE] JUMP_COND não realizado (R%d != 1)\n", rd);
                     }
-                    ciclosExecucao++;
-                    return;
-                case 3: // MOV
-                    registrador.escrever(instrucao.getRegistradorDestino(), instrucao.getImediato());
+                    break;
+                case MOV:
+                    registradores.escrever(rd, instrucao.getRegistrador1());
+                    System.out.printf("[EXECUTE] MOV R%d = %d\n", rd, imediato);
+                    break;
+                case NOP_I:
+                    System.out.println("[EXECUTE] NOP (I-Type)");
                     break;
                 default:
-                    System.out.println("Opcode I inválido: " + opcode);
+                    System.err.println("[Erro] Operação I-Type inválida: " + operacao);
                     executando = false;
-                    return;
+                    break;
             }
         }
 
-        incrementarPC();
-        ciclosExecucao++;
+        return pcModificado;
     }
 
-    private void incrementarPC() {
-        PCcontador++;
+    private void registrarEstadoFinal() {
+        System.out.println("\n--- Relatório Final da Execução ---");
+        System.out.printf("Total de Ciclos da CPU: %d\n", ciclos);
+        System.out.printf("PC Final: %d\n", contadorPrograma);
+        registradores.mostrarConteudo();
+        memoria.mostrarConteudo(0, 30);
+        System.out.println("----------------------------------");
     }
 }

@@ -1,10 +1,19 @@
 package src.app;
-import simulador.Processador;
+
+import src.simulador.Processador;
 
 public class Main {
     public static void main(String[] args) {
-        Processador processador = new Processador();
-        processador.carregarPrograma("C:/msys64/home/gusta/arq-sim-assembler/perfect-squares.bin");
-        processador.iniciar();
+        Processador cpu = new Processador();
+
+        // Caminho para o arquivo binário (ajuste se necessário)
+        String caminhoArquivoBin = "C:/msys64/home/gusta/arq-sim-assembler/simple-1.bin";
+        int pcInicial = 1;
+
+        while(cpu.isExecutando()){
+            cpu.carregarPrograma(caminhoArquivoBin, pcInicial);
+            cpu.executarProgramaCompleto();
+        }
+        System.err.println("Terminou de executar");
     }
 }
