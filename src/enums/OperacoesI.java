@@ -13,6 +13,7 @@ public enum OperacoesI{
         this.opcode = opcode;
     }
 
+
     public int getOpcode() {
         return opcode;
     }

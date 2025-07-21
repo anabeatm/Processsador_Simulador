@@ -31,6 +31,7 @@ public enum OperacoesR{
      */
     public static OperacoesR fromOpcode(int opcode) {
         for (OperacoesR op : OperacoesR.values()) {
+
             if (op.getOpcode() == opcode) {
                 return op;
             }
