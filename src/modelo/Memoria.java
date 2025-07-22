@@ -6,7 +6,7 @@ import java.io.IOException;
 
 public class Memoria {
     private short[] memoria = new short[65536];
-    private final int tamanhoMemoria = 65536;
+//    private final int tamanhoMemoria = 65536;
 
     public Memoria() {
         for(int i = 0; i < 65536; ++i) {

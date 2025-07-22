@@ -15,14 +15,14 @@ public class Processador {
     private int contadorPrograma = 1;
     public boolean executando = true;
     private int ciclos = 0;
-    private int formato;
+//    private int formato;
 
     public Processador() {
     }
 
-    public boolean isExecutando() {
-        return this.executando;
-    }
+//    public boolean isExecutando() {
+//        return this.executando;
+//    }
 
     public void carregarPrograma(String caminhoArquivoBin, int pcInicial) {
         this.memoria.carregarBinario(caminhoArquivoBin, pcInicial);

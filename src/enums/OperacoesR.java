@@ -14,7 +14,7 @@ public enum OperacoesR {
 
     private final int opcode;
 
-    private OperacoesR(int opcode) {
+    OperacoesR(int opcode) {
         this.opcode = opcode;
     }
 

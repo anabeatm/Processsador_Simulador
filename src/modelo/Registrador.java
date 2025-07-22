@@ -2,7 +2,7 @@ package src.modelo;
 
 public class Registrador {
     private short[] registradores = new short[8];
-    private final int numeroRegistradores = 8;
+//    private final int numeroRegistradores = 8;
 
     public Registrador() {
         for(int i = 0; i < 8; ++i) {

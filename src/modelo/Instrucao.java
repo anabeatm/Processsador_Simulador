@@ -62,9 +62,9 @@ public class Instrucao {
         return this.imediato;
     }
 
-    public short getOpcode() {
-        return (short)(this.codigoBinario >> 12 & 15);
-    }
+//    public short getOpcode() {
+//        return (short)(this.codigoBinario >> 12 & 15);
+//    }
 
     public String toString() {
         if (this.tipo == TipoInstrucao.R) {
