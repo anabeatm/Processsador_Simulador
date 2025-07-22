@@ -1,7 +1,7 @@
-package src.model;
+package src.modelo;
 
-import src.enums.OperacoesR; // Importado
-import src.simulador.Processador;
+import src.enums.OperacoesR;
+
 
 public class ALU {
     public short executar(OperacoesR operacao, short operando1, short operando2, short rd) {
