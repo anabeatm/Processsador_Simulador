@@ -1,49 +1,44 @@
 package src.modelo;
 
-public class Registrador { // Nome da classe corrigido para o singular
-    private int[] registradores;
+public class Registrador {
+    private short[] registradores = new short[8];
+    private final int numeroRegistradores = 8;
 
     public Registrador() {
-        this.registradores = new int[8]; // 8 registradores de 32 bits (int)
-        // Inicializa os registradores com zero
-        for (int i = 0; i < 8; i++) {
-            registradores[i] = 0;
+        for(int i = 0; i < 8; ++i) {
+            this.registradores[i] = 0;
         }
-        System.out.println("[DEBUG Registrador] Nova instância de Registrador criada e inicializada com zeros.");
+
     }
 
-    public int ler(int indice) {
-        if (indice < 0 || indice >= registradores.length) {
-            System.err.println("[ERRO Registrador] Tentativa de ler registrador inválido: " + indice);
-            return 0; // Ou lançar exceção
+    public short ler(int indice) {
+        if (indice >= 0 && indice < 8) {
+            return this.registradores[indice];
+        } else {
+            System.err.println("[Erro Registrador] Tentativa de leitura em registrador inválido: R" + indice);
+            return 0;
         }
-        System.out.println("[DEBUG Registrador.ler] Lendo R" + indice + ". Valor do array: " + registradores[indice]); // Adicione esta linha
-        return registradores[indice];
     }
 
-    public void escrever(int indice, int valor) {
-
-        if (indice < 0 || indice >= registradores.length) {
-            System.err.println("[ERRO Registrador] Tentativa de escrever em registrador inválido: " + indice);
-            return;
+    public void escrever(int indice, short valor) {
+        if (indice >= 0 && indice < 8) {
+            this.registradores[indice] = valor;
+        } else {
+            System.err.println("[Erro Registrador] Tentativa de escrita em registrador inválido: R" + indice);
         }
-        registradores[indice] = valor;
-        System.out.println("[DEBUG Registrador.escrever] Escreveu " + valor + " em R" + indice + ". Valor atual do array: " + registradores[indice]);
-    }
 
-    // NOVO MÉTODO: Para resetar os registradores para zero
-    public void resetar() {
-        for (int i = 0; i < 8; i++) {
-            registradores[i] = 0;
-        }
-        System.out.println("[DEBUG Registrador] Registradores resetados para zero.");
     }
 
     public void mostrarConteudo() {
         System.out.println("\n--- Conteúdo dos Registradores ---");
-        for (int i = 0; i < 8; i++) {
-            System.out.printf("R%d: %d\n", i, registradores[i]);
+
+        for(int i = 0; i < 8; ++i) {
+            System.out.printf("R%02d: (%d) ", i, this.registradores[i]);
+            if ((i + 1) % 8 == 0) {
+                System.out.println();
+            }
         }
+
         System.out.println("----------------------------------");
     }
 }

@@ -1,11 +1,10 @@
 package src.enums;
 
-public enum OperacoesI{
-    // Opcodes para instruções Tipo I (formato 1) - Opcode de 2 bits (bits 13-14)
-    JUMP(0),         // 00 - JUMP incondicional
-    JUMP_COND(1),    // 01 - JUMP condicional
-    MOV(3),          // 11 - Move imediato para registrador
-    NOP_I(-1);       // No-Operation específica para Tipo I, para tratamento de erro
+public enum OperacoesI {
+    JUMP(0),
+    JUMP_COND(1),
+    MOV(3),
+    NOP_I(-1);
 
     private final int opcode;
 
@@ -14,20 +13,16 @@ public enum OperacoesI{
     }
 
     public int getOpcode() {
-        return opcode;
+        return this.opcode;
     }
 
-    /**
-     * Retorna a OperacaoIType correspondente a um opcode.
-     * @param opcode O valor do opcode a ser procurado.
-     * @return A OperacaoIType correspondente, ou NOP_I se não for encontrada.
-     */
     public static OperacoesI fromOpcode(int opcode) {
-        for (OperacoesI op : OperacoesI.values()) {
+        for(OperacoesI op : values()) {
             if (op.getOpcode() == opcode) {
                 return op;
             }
         }
-        return NOP_I; // Retorna NOP_I se o opcode não for encontrado
+
+        return NOP_I;
     }
 }

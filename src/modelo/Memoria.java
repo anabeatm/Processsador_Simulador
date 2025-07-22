@@ -3,68 +3,77 @@ package src.modelo;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
-// Não precisa importar Instrucao aqui diretamente
 
 public class Memoria {
-    private short[] memoria;
-    private int tamanhoMemoria;
+    private short[] memoria = new short[65536];
+    private final int tamanhoMemoria = 65536;
 
-    public Memoria(int tamanho) {
-        this.tamanhoMemoria = tamanho;
-        this.memoria = new short[tamanho];
-        for (int i = 0; i < tamanhoMemoria; i++) {
-            memoria[i] = 0;
+    public Memoria() {
+        for(int i = 0; i < 65536; ++i) {
+            this.memoria[i] = 0;
         }
+
     }
 
     public short ler(int endereco) {
-        if (endereco < 0 || endereco >= tamanhoMemoria) {
-            throw new RuntimeException("[ERRO] Acesso de memória inválido: endereço " + endereco);
+        if (endereco >= 0 && endereco < 65536) {
+            return this.memoria[endereco];
+        } else {
+            System.err.println("[Erro Memoria] Tentativa de leitura em endereço inválido: " + endereco);
+            return 0;
         }
-        return memoria[endereco];
-    }
-
-    public void escrever(int endereco, short valor) {
-        if (endereco < 0 || endereco >= tamanhoMemoria) {
-            throw new RuntimeException("[ERRO] Acesso de memória inválido: endereço " + endereco);
-        }
-        memoria[endereco] = valor;
     }
 
     public void carregarBinario(String caminhoArquivoBinario, int enderecoInicial) {
-        try (DataInputStream dataInputStream = new DataInputStream(new FileInputStream(caminhoArquivoBinario))) {
-            int bytesDisponiveis = dataInputStream.available();
-            int numShorts = bytesDisponiveis / 2;
+        try {
+            FileInputStream fileInputStream = new FileInputStream(caminhoArquivoBinario);
+            DataInputStream dataInputStream = new DataInputStream(fileInputStream);
+            long tamanhoArquivo = fileInputStream.getChannel().size();
+            int numShorts = (int)(tamanhoArquivo / 2L);
 
-            System.out.println("[DEBUG Memoria] Carregando " + numShorts + " shorts do arquivo " + caminhoArquivoBinario + " a partir do endereço " + enderecoInicial);
-
-            for (int i = 0; i < numShorts; i++) {
-                int low = dataInputStream.readByte() & 0x000000FF;
-                int high = dataInputStream.readByte() & 0x000000FF;
-
-                short valor = (short) ((low & 0xFF) | ((high & 0xFF) << 8));
-
-                if (enderecoInicial + i < tamanhoMemoria) {
-                    memoria[enderecoInicial + i] = valor;
-                    System.out.printf("[DEBUG Memoria] Carregando 0x%04x (low: 0x%02x, high: 0x%02X) no endereço %d\n",
-                            valor & 0xFFFF, low, high, enderecoInicial + i);
-                } else {
+            for(int i = 0; i < numShorts; ++i) {
+                int low = dataInputStream.readByte() & 255;
+                int high = dataInputStream.readByte() & 255;
+                short valor = (short)(low & 255 | (high & 255) << 8);
+                if (enderecoInicial + i >= 65536) {
                     System.err.println("[Aviso Memoria] Arquivo binário excede o tamanho da memória na posição: " + (enderecoInicial + i));
                     break;
                 }
+
+                this.memoria[enderecoInicial + i] = valor;
+                System.out.printf("[DEBUG Memoria] Carregando 0x%04X (low: 0x%02X, high: 0x%02X) no endereço %d\n", valor & '\uffff', low, high, enderecoInicial + i);
             }
-            System.out.println("[DEBUG Memoria] Carregamento do binário concluído.");
+
+            dataInputStream.close();
+            fileInputStream.close();
+            System.out.println("Arquivo binário '" + caminhoArquivoBinario + "' carregado com sucesso a partir do endereço " + enderecoInicial);
         } catch (IOException e) {
-            System.err.println("[ERRO Memoria] Falha ao carregar o arquivo binário: " + e.getMessage());
-            throw new RuntimeException("Erro ao carregar binário.", e);
+            System.err.println("[Erro Memoria] Falha ao carregar o arquivo binário: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Falha crítica ao carregar o programa binário: " + e.getMessage(), e);
         }
     }
 
+    public int getTamanhoMemoria() {
+        return 65536;
+    }
+
     public void mostrarConteudo(int inicio, int fim) {
-        System.out.println("\n--- Conteúdo da Memória (" + inicio + " a " + fim + ") ---");
-        for (int i = inicio; i < fim && i < tamanhoMemoria; i++) {
-            System.out.printf("Memória[%03d]: 0x%04X (%s)\n", i, memoria[i] & 0xFFFF, Integer.toBinaryString(memoria[i] & 0xFFFF));
+        System.out.println("\n--- Conteúdo da Memória (" + inicio + " - " + fim + ") ---");
+
+        for(int i = inicio; i < fim && i < 65536; ++i) {
+            System.out.printf("Memória[%d]: 0x%04X (%d)\n", i, this.memoria[i], this.memoria[i]);
         }
-        System.out.println("----------------------------------");
+
+        System.out.println("--------------------------");
+    }
+
+    public void store(int endereco, short valor) {
+        this.memoria[endereco + 1] = valor;
+
+        for(int i = 0; i < 10; ++i) {
+            System.out.println(this.memoria[i]);
+        }
+
     }
 }

@@ -10,7 +10,7 @@ public enum TipoInstrucao {
         this.tipo = tipo;
     }
 
-    public int getTipo() {
-        return tipo;
-    }
+//    public int getTipo() {
+//        return this.tipo;
+//    }
 }
