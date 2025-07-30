@@ -8,7 +8,7 @@ public class Main {
 
     public static void main(String[] args) {
         Processador cpu = new Processador();
-        String caminhoArquivoBin = "src/testes/memory.bin";
+        String caminhoArquivoBin = "src/testes/perfect-squares.bin";
         int pcInicial = 1;
         cpu.carregarPrograma(caminhoArquivoBin, pcInicial);
         cpu.executarProgramaCompleto();
